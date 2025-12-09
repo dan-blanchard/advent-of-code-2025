@@ -1,26 +1,28 @@
+"""Advent of Code 2025 Day 1 Solution
+
+author: Dan Blanchard
+"""
+
 import argparse
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Open the safe for day 1 of Advent of Code."
-    )
-    parser.add_argument("input_file", type=str, help="Path to the input file")
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Print debug messages"
-    )
-    args = parser.parse_args()
+def parse_line(line: str) -> tuple[str, int]:
+    line = line.strip()
+    direction = line[0]
+    value = int(line[1:])
+    return direction, value
 
+
+def main(*, input_file: str, verbose: bool):
     position = 50
     exact_zero_count = 0
     passed_zero_count = 0
-    if args.verbose:
+    if verbose:
         print(f"  - The dial starts by pointing at {position}")
-    with open(args.input_file, "r") as file:
+    with open(input_file, "r") as file:
         lines = file.readlines()
         for line in lines:
-            direction = line[0]
-            value = int(line[1:].strip())
+            direction, value = parse_line(line)
             # If we are turning right, we increase, left, we decrease
             mult = 1 if direction == "R" else -1
             start_pos = position
@@ -63,7 +65,7 @@ def main():
             if position == 0:
                 exact_zero_count += 1
             passed_zero_count += passes
-            if args.verbose:
+            if verbose:
                 print(
                     f"  - The dial is rotated {direction}{value} to point at {position}",
                     end="",
@@ -80,4 +82,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Open the safe for day 1 of Advent of Code."
+    )
+    parser.add_argument("input_file", type=str, help="Path to the input file")
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Print debug messages"
+    )
+    args = parser.parse_args()
+
+    main(input_file=args.input_file, verbose=args.verbose)
