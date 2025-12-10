@@ -43,20 +43,24 @@ class JunctionBox:
         return f"({self.x}, {self.y}, {self.z})"
 
 
-def connect_closest_boxes(boxes, iterations, verbose):
+def connect_closest_boxes(boxes, iterations: int, verbose):
     box_distances = {
         (box1, box2): box1.distance_from(box2)
         for box1, box2 in itertools.combinations(boxes, 2)
     }
-    closest_boxes = sorted(box_distances.items(), key=itemgetter(1))[:iterations]
-    for closest_pair, shortest_distance in closest_boxes:
+    closest_boxes = sorted(box_distances.items(), key=itemgetter(1))
+    for i, ((box1, box2), distance) in enumerate(closest_boxes):
+        if iterations and i > iterations:
+            break
         if verbose:
-            print(
-                f"Connected {closest_pair[0]} to {closest_pair[1]} with distance {shortest_distance}"
-            )
-            if closest_pair[0].circuit == closest_pair[1].circuit:
+            print(f"Connected {box1} to {box2} with distance {distance}")
+            if box1.circuit == box2.circuit:
                 print("...but they were already in the same circuit")
-        closest_pair[0].connect(closest_pair[1])
+        box1.connect(box2)
+        if len(box1.circuit) == len(boxes):
+            print(f"Final connection made between {box1} and {box2}")
+            print(f"Product of X of those boxes = {box1.x * box2.x}")
+            break
 
 
 def find_circuits(boxes):
@@ -110,7 +114,7 @@ if __name__ == "__main__":
         description="Connect some junction boxes for day 8 of Advent of Code."
     )
     parser.add_argument("input_file", type=str, help="Path to the input file")
-    parser.add_argument("n", type=int, help="Number of pairs to try to connect")
+    parser.add_argument("-n", type=int, help="Number of pairs to try to connect")
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Print debug messages"
     )
